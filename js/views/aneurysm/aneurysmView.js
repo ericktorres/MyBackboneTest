@@ -10,20 +10,33 @@ define([
 		el: $('#mainContainer'),
 		render: function(){
 			this.$el.html(aneurysmTemplate);
+
 			var aneurysmModel = new AneurysmModel();
 
-			$('#nameAneurysm').html(aneurysmModel.data.name);
+			/* Adding listener to the button Add New */
+			$('#addTreatment').click(function(){
+				var newItem = aneurysmModel.addNewTreatment();
+				
+				$('#contentAneurysm').html(newItem); //Updating the content after to add a new item
+			});
+
+			$('#nameAneurysm').html(aneurysmModel.get('name'));
 			
-			var content = "";
-			var total = aneurysmModel.data.treatments.length;
+			/* Showing the Treatments */
+			var treatments = aneurysmModel.showTreatments();			
+			$('#contentAneurysm').html(treatments);	
 			
-			for(var i=0; i<total; i++){
-				var data = aneurysmModel.data.treatments[i];
-				content += '<b>' + data.display_name + ': </b> '+ data.description +'<br>';	
-			}
+		},
+		events:{
+			'click #contentAneurysm a':'updateItem'
+		},
+		updateItem: function(button){
+			var aneurysmModel = new AneurysmModel();			
+			var index = $(button.currentTarget).attr('id'); //Getting the position of the element selected			
 			
-			$('#contentAneurysm').html(content);
+			var updatedItem = aneurysmModel.editTreatment(index); //Call to method for the updating item
 			
+			$('#contentAneurysm').html(updatedItem); //Updating the content after to edit a new item
 		}
 	});
 

@@ -4,9 +4,9 @@ define([
     ], function(_, Backbone){
 
     var AneurysmModel = Backbone.Model.extend({
-        data: {
-            "name": "Aneurysm",
-            "treatments": [
+        defaults: {
+            name: "Aneurysm",
+            treatments: [
                 {
                     "description":"High blood pressure, or hypertension, can increase your risk of an aneurysm. The force of the blood against the walls of your arteries can stretch part of a wall until it bulges outward (an aneurysm), particularly if the artery is already diseased. If you're diagnosed with an aneurysm, the goal of treatment is to prevent it from rupturing (bursting) or putting pressure on the surrounding organs. This includes controlling high blood pressure, often through blood pressure medication (known as...",
                     "display_name":"ACE inhibitors"
@@ -37,26 +37,49 @@ define([
                 }
             ]
         },
+        showTreatments: function(){
+            var arrTreatments = this.get('treatments');
+            var total = arrTreatments.length;
+            var data, content='';
 
-        fetch: function (options) {
-            options = options ? _.clone(options) : {};
+            for(var i=0; i<total; i++){
+                data = arrTreatments[i];
+                content += '<b>' + data.display_name + ': </b> <a id="'+i+'" class="tiny button round">UPDATE</a><br/> ' + data.description + '<br />';
+            }
 
-            if (!this.set(this.data, options)) {
-                return false;
-            }
-            if (options.success) {
-                options.success(this, {});
-            }
+            return content;
         },
+        addNewTreatment: function(){
+            var arrTreatments = this.get('treatments');
+            var displayName = prompt('Enter the Display Name:');
+            var description = prompt('Enter the Description:');            
+            
+            arrTreatments.push({"description":description, "display_name":displayName});
 
-        save: function (options) {
-            options = options ? _.clone(options) : {};
+            this.set({treatments:arrTreatments});
 
-            if (options.success) {
-                options.success(this, {});
+            var updatedContent = this.showTreatments();
+
+            return updatedContent;
+        },
+        editTreatment: function(index){
+            var arrTreatments = this.get('treatments');
+            var currentName = arrTreatments[index].display_name;
+            var currentDescription = arrTreatments[index].description;            
+
+            var newDisplayName = prompt('Enter the new Display Name:', currentName);
+            var newDescription = prompt('Enter the new Description:', currentDescription);
+
+            if(newDisplayName != null || newDescription != null){
+                arrTreatments[index].display_name = newDisplayName;
+                arrTreatments[index].description = newDescription;
             }
-            return {};
+            
+            var updatedContent = this.showTreatments();
+
+            return updatedContent;
         }
+        
     });
 
     return AneurysmModel;
